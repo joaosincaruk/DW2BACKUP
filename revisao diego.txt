@@ -1,0 +1,247 @@
+1 - npm init -y (inicia com as info padrão)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2 - npm install express ejs sequelize mysql2 nodemon
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+3 - package.json: "npx nodemon index.js"
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+4 - "type": "module" (colocar depois da penúltima chave fechando)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+5 - criar o index.js na raiz do projeto 
+	import express from "express"
+	const app = express()
+
+	const port = 8080
+	app.listen(port, (error)=>{
+    	if(error){
+        	console.log(`Ocorreu um erro: ${error}`)
+    		} else { 
+        	console.log(`Servidor inciado em http://localhost:${port}`)
+   		 }
+})
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+6 - npm start
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+7 - criar pastas
+
+	- models
+	- views
+	- controllers 
+
+8 -  na pasta controllers, criar o arquivo MoviesController
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+9 - importar o express, criar a rota e exportar:
+	import express from "express"
+
+const router = express.Router()
+
+router.get("/", (req,res)=>{
+    res.send("Deu certo!")
+})
+
+export default router
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+10 - importar o import MoviesController from "./controllers/MoviesControllers.js" no index.js
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+11 -  no index, falar pro express que vai usar as rotas que estão no controller
+app.use("/", MoviesController)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+12 - criar a pagina movies.ejs no Views
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+13 - atualizar no MoviesController
+
+router.get("/", (req,res)=>{
+    res.render("movies")
+})
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+14 - no index, inserir app.set("view engine", "ejs")
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+15 - criar em views a pasta partials com o arquivo:
+
+footer.ejs
+header.ejs
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+16 - no header setar o html "!" e apagar o fechamento do body e html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 style="text-align: center;"> The Movies </h1>
+    <hr>
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+17 - no footer: 
+
+<footer>
+    <hr>
+    The Movier &copy; 2025
+</footer>
+</body>
+</html>
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+18 - no movies: 
+<%- include ('partials/header.ejs') %>
+<%- include ('partials/footer.ejs') %>
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+19 - criar a pasta config e o arquivo sequelize-config.js
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+20 - no sequelize-config.js: 
+
+import Sequelize from "sequelize";
+const connetction = new Sequelize({
+    dialect: "mysql",
+    host: "localhost",
+    username: "root",
+    password: "",
+    //database: "movies",
+    timezone: "-03:00",
+});
+export default connetction
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+21 -  importar no index o connection
+
+import connetction from "./config/sequelize-config.js"
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+22 - embaixo das rotas no index, criar a conexão
+
+connetction.authenticate().then(()=> {
+    console.log("Conexão com o banco de dados feita com sucesso!")
+
+}).catch((error)=>{
+    console.log(error)
+})
+const port = 8080
+app.listen(port, (error)=>{
+    if(error){
+        console.log(`Ocorreu um erro: ${error}`)
+    } else { 
+        console.log(`Servidor inciado em http://localhost:${port}`)
+    }
+})
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+23 - criar o banco com o método query
+
+connetction.query(`CREATE DATABASE IF NOT EXISTS movies;`).then(()=>{
+    console.log("O banco de dados está criado!")
+}).catch(error => {
+    console.log(error)
+})
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+24 - na pasta models, criar o arquivo Movie.js, onde serão criadas as tabelas 
+
+importar o sequelize e o connection
+
+import Sequelize from "sequelize";
+import connetction from "../config/sequelize-config.js";
+
+const Movie = connetction.define("movies", {
+    title: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    genre: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    duration: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+    },
+})
+
+Movie.sync({ force: false}) 
+export default Movie;
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+25 - Em MoviesController.js importar o Movie
+
+import Movie from "../models/Movie.js"
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+26 - em movies.ejs, criar o form de cadastro
+
+
+<%- include ('partials/header.ejs') %>
+
+
+<div class="container">
+    <h1> Cadastrar novo filme:</h1>
+    <form action="/movies/new" method="POST">
+        <input type="text" name="title" placeholder="Insira o titulo do filme">
+        <input type="text" name="genre" placeholder="Insira o genero do filme">
+        <input type="number" name="duration" placeholder="Insira a duração do filme">
+        <input type="submit" value="Cadastrar">
+    </form>
+    <br><hr><br>
+</div>
+
+
+
+<%- include ('partials/footer.ejs') %>
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+27 - criar a rota post no controller
+
+
+router.post("/movies/new", (req, res)=>{
+    const title = req.body.title
+    const genre = req.body.genre
+    const duration = req.body.duration
+    Movie.create({
+        title: title,
+        genre: genre,
+        duration: duration,
+    }).then(() =>{
+        res.redirect("/")
+    }).catch((error)=>{
+        console.log(error)
+    })
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+28 - em index: 
+app.use(express.urlencoded({ extended: false})) 
+ tem que estar em cima da rota app.use("/", MoviesController)
+
+29 - criar form em movies
+
+div class="container">
+    <h1> Cadastrar novo filme:</h1>
+    <form action="/movies/new" method="POST">
+        <input type="text" name="title" placeholder="Insira o titulo do filme">
+        <input type="text" name="genre" placeholder="Insira o genero do filme">
+        <input type="number" name="duration" placeholder="Insira a duração do filme">
+        <input type="submit" value="Cadastrar">
+    </form>
+    <table>
+        <thead>
+            <th style="width: 150px; text-align: center;">Título:</th>
+            <th style="width: 150px; text-align: center;">Gênero:</th>
+            <th style="width: 150px; text-align: center;">Duração</th>
+            <th style="width: 150px; text-align: center;">Ações</th>
+
+        </thead>
+        <tbody>
+            <% movies.forEach(movie => { %>
+            <tr>
+                <td><%= movie.title %></td>
+                <td><%= movie.genre %></td>
+                <td><%= movie.duration %> </td>
+                <td><a onclick="return confirm('Deseja mexmo excluir o filme?')" href="/movies/delete/<%= movie.id %>">Excluir</a></td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+    <br><hr><br>
+</div>
+
+
+30 - no controller, mudar assim:
+router.get("/", (req,res)=>{
+    Movie.findAll().then((movies)=>{
+        res.render("movies",{
+            movies : movies
+        })
+
+    })
+})
+
+
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autoescola Nova Dallas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+        }
+        header {
+            background-color: #ff6600;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        section {
+            padding: 40px;
+            text-align: center;
+        }
+        .btn {
+            background-color: #ff6600;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #e65c00;
+        }
+        footer {
+            background-color: #111;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+        function createElement(tag, attributes = {}, content = "") {
+            const element = document.createElement(tag);
+            for (const key in attributes) {
+                element.setAttribute(key, attributes[key]);
+            }
+            element.innerHTML = content;
+            return element;
+        }
+
+        function solicitarOrcamento() {
+            alert("Entre em contato pelo telefone para solicitar seu orçamento!");
+        }
+
+        function init() {
+            const root = document.getElementById("root");
+
+            const header = createElement("header", {}, "Autoescola Nova Dallas");
+            
+            const sectionSobre = createElement("section", {}, "<h2>Sobre Nós</h2><p>Na Autoescola Nova Dallas, garantimos um serviço de qualidade. São mais de 18 anos de experiência!.</p>");
+            
+            const sectionServicos = createElement("section", {}, "<h2>Serviços</h2><p>✔ Habilitação Categoria A/B</p> <p>✔ Habilitação Categoria A</p><p>✔ Aulas práticas e teóricas</p><p>✔ Reciclagem para condutores</p> ");
+            
+            const sectionContato = createElement("section", {});
+            sectionContato.innerHTML = "<h2>Contato</h2><p>📍 Endereço: Rua Exemplo, 123 - Cidade</p><p>📞 Telefone: (XX) XXXX-XXXX</p>";
+            
+            const button = createElement("button", { class: "btn", onclick: "solicitarOrcamento()" }, "Solicite um Orçamento");
+            sectionContato.appendChild(button);
+            
+            const footer = createElement("footer", {}, "&copy; 2025 Autoescola Nova Dallas. Todos os direitos reservados.");
+            
+            root.append(header, sectionSobre, sectionServicos, sectionContato, footer);
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>
